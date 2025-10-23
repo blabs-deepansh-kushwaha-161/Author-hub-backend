@@ -11,10 +11,26 @@ from django.contrib.auth.models import User
 from rest_framework_simplejwt.tokens import RefreshToken
 from .serializers import RegisterSerializer
 from rest_framework.permissions import IsAuthenticated
+from .serializers import BookSerializer
+from .models import Book
 class UserViewSet(viewsets.ModelViewSet):
     queryset = User.objects.all()
     serializer_class = UserSerializer
 
+
+
+
+class BookViewSet(viewsets.ModelViewSet):
+    serializer_class = BookSerializer
+    permission_classes = [permissions.IsAuthenticated]
+
+    def get_queryset(self):
+        # Only return books created by the current user
+        return Book.objects.filter(user=self.request.user)
+
+    def perform_create(self, serializer):
+        # Automatically set the user to the logged-in user
+        serializer.save(user=self.request.user)
 
 
 # Register View

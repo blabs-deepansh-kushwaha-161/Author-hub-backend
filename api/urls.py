@@ -1,10 +1,15 @@
 
-from django.urls import path
+from django.urls import path, include
 from rest_framework_simplejwt.views import (
     TokenObtainPairView,
     TokenRefreshView,
 )
 from .views import RegisterView, LogoutView , MeView    
+from rest_framework.routers import DefaultRouter
+from .views import BookViewSet
+
+router = DefaultRouter()
+router.register(r"books", BookViewSet, basename="books")
 
 urlpatterns = [
     # JWT login and refresh endpoints
@@ -16,3 +21,5 @@ urlpatterns = [
     path('logout/', LogoutView.as_view(), name='logout'),
     path('me/',MeView.as_view(), name='me'),
 ]
+
+urlpatterns += router.urls
