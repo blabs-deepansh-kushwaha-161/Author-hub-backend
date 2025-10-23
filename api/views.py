@@ -10,7 +10,7 @@ from rest_framework.views import APIView
 from django.contrib.auth.models import User
 from rest_framework_simplejwt.tokens import RefreshToken
 from .serializers import RegisterSerializer
-
+from rest_framework.permissions import IsAuthenticated
 class UserViewSet(viewsets.ModelViewSet):
     queryset = User.objects.all()
     serializer_class = UserSerializer
@@ -26,7 +26,7 @@ class RegisterView(generics.CreateAPIView):
 
 # Logout View
 class LogoutView(APIView):
-    permission_classes = (permissions.IsAuthenticated,)
+    permission_classes = (IsAuthenticated,)
 
     def post(self, request):
         try:
@@ -36,3 +36,18 @@ class LogoutView(APIView):
             return Response({"message": "Successfully logged out."}, status=205)
         except Exception:
             return Response({"error": "Invalid token"}, status=400)
+        
+
+# Me View
+class MeView(generics.RetrieveAPIView): 
+    permission_classes = [permissions.IsAuthenticated]
+
+    def get(self, request):
+        user = request.user
+        return Response({
+            "id": user.id,
+            "username": user.username,
+            "email": user.email,
+            "first_name": user.first_name,
+            "last_name": user.last_name,
+        })
